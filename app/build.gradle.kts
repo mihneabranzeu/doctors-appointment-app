@@ -1,6 +1,12 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+
+    // Firebase
+    id("com.google.gms.google-services")
+    // Hilt
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -59,6 +65,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -66,4 +73,87 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Firebase/firestore
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    // Firebase auth
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
+
+    //material icons - use with caution!
+    implementation("androidx.compose.material:material-icons-extended:1.6.3")
+
+    // Coroutines
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+
+    //Coil
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // Retrofit
+
+    implementation("com.squareup.retrofit2:retrofit:2.10.0")
+
+
+
+    //OkHttp
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0") // 5.0.0-alpha.2 in course
+
+
+
+    //gson
+
+    implementation("com.google.code.gson:gson:2.10.1")
+
+
+
+
+
+    implementation("androidx.core:core-ktx:1.12.0")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+
+    implementation("androidx.activity:activity-compose:1.8.2")
+
+    implementation(platform("androidx.compose:compose-bom:2024.02.02"))
+
+    implementation("androidx.compose.ui:ui")
+
+    implementation("androidx.compose.ui:ui-graphics")
+
+    implementation("androidx.compose.ui:ui-tooling-preview")
+
+    implementation("androidx.compose.material3:material3")
+
+    testImplementation("junit:junit:4.13.2")
+
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
+
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    debugImplementation("androidx.compose.ui:ui-tooling")
+
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.3")
+}
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }
