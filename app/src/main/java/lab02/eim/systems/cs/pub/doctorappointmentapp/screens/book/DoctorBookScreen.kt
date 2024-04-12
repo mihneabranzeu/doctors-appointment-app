@@ -46,8 +46,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import dagger.hilt.android.lifecycle.HiltViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.components.DoctorAppBar
 import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MDoctor
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
@@ -57,7 +59,8 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookAppointmentScreen(navController: NavController) {
+fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchViewModel = hiltViewModel()) {
+
     Scaffold (
         topBar = { DoctorAppBar(title = "Book Appointment",
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
@@ -66,7 +69,6 @@ fun BookAppointmentScreen(navController: NavController) {
             navController.navigate(DoctorScreens.DoctorHomeScreen.name)
         }
                  },
-
     ) {
         Surface (modifier = Modifier
             .padding(it)
@@ -100,7 +102,6 @@ fun BookAppointmentScreen(navController: NavController) {
                     "Constanta"
                 )
 
-
                 var showDatePicker by remember {
                     mutableStateOf(false)
                 }
@@ -127,9 +128,15 @@ fun BookAppointmentScreen(navController: NavController) {
                 DropdownMenuBox(specialties, specialty)
                 DropdownMenuBox(locations, location)
 
+                Button(onClick = {
+                             viewModel.searchDoctors(specialty.value, location.value)
+                }, ) {
+                    Text(text = "Search")
+                }
+
                 Spacer(modifier = Modifier.height(13.dp))
 
-                DoctorList( navController);
+                DoctorList( navController,viewModel );
 
 
 
@@ -194,7 +201,10 @@ fun DoctorRow(doctor: MDoctor, navController: NavController) {
         Row(Modifier.padding(5.dp), verticalAlignment = Alignment.Top) {
             val imageUrl = "https://t3.ftcdn.net/jpg/02/60/04/08/360_F_260040863_fYxB1SnrzgJ9AOkcT0hoe7IEFtsPiHAD.jpg"
             Image(painter = rememberImagePainter(data = imageUrl), contentDescription = "Doctor",
-                modifier = Modifier.width(120.dp).fillMaxHeight().padding(end = 4.dp))
+                modifier = Modifier
+                    .width(120.dp)
+                    .fillMaxHeight()
+                    .padding(end = 4.dp))
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(text = doctor.firstName + " " + doctor.lastName, fontWeight = FontWeight.Bold)
                 Text(text = doctor.speciality.toString())
@@ -206,20 +216,11 @@ fun DoctorRow(doctor: MDoctor, navController: NavController) {
 }
 
 @Composable
-fun DoctorList(navController: NavController) {
-    val doctors = listOf(
-        MDoctor("1", "John","Doe", "Cardiology", "Cluj-Napoca"),
-        MDoctor("2", "Petre","Dumitrescu", "Cardiology", "Cluj-Napoca"),
-        MDoctor("3", "Stefan","Tutugan", "Cardiology", "Cluj-Napoca"),
-        MDoctor("4", "Tudor","Coheea", "Cardiology", "Cluj-Napoca"),
-        MDoctor("5", "Vlad","Pangratie", "Cardiology", "Cluj-Napoca"),
-        MDoctor("6", "Eduard","Honciu", "Cardiology", "Cluj-Napoca")
-
-    )
+fun DoctorList(navController: NavController, viewModel: DoctorSearchViewModel ) {
     LazyColumn (modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(items = doctors) { doctor ->
+        items(items = viewModel.listOfDoctors.value.data!!) { doctor ->
             DoctorRow(doctor = doctor, navController)
         }
     }

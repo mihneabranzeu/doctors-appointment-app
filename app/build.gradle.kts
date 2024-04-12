@@ -85,6 +85,10 @@ dependencies {
     // Hilt
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    implementation("androidx.fragment:fragment-ktx:1.5.5")
+    implementation("androidx.navigation:navigation-compose:2.5.3")
 
     //material icons - use with caution!
     implementation("androidx.compose.material:material-icons-extended:1.6.3")
@@ -106,6 +110,7 @@ dependencies {
     // Retrofit
 
     implementation("com.squareup.retrofit2:retrofit:2.10.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.10.0")
 
 
 

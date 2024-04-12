@@ -1,12 +1,15 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.lifecycle.HiltViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.DoctorSplashScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.appointments.AppointmentsScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book.BookAppointmentScreen
+import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book.DoctorSearchViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.home.Home
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.login.Login
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.profile.ProfileScreen
@@ -28,7 +31,8 @@ fun DoctorNavigation() {
       }
 
       composable(DoctorScreens.BookAppointmentScreen.name) {
-         BookAppointmentScreen(navController = navController)
+         val bookViewModel = hiltViewModel<DoctorSearchViewModel>()
+         BookAppointmentScreen(navController = navController, bookViewModel)
       }
 
       composable(DoctorScreens.LoginScreen.name) {
