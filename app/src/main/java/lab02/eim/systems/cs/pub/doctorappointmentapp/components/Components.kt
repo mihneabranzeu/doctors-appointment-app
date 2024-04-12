@@ -1,10 +1,15 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -12,9 +17,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -30,9 +39,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -43,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import lab02.eim.systems.cs.pub.doctorappointmentapp.R
+import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MAppointment
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
 
 @Composable
@@ -140,13 +152,19 @@ fun TitleSection(modifier: Modifier = Modifier, label: String) {
 fun DoctorAppBar(
     title: String,
     showProfile: Boolean = true,
-    navController: NavController
+    navController: NavController,
+    icon: ImageVector? = null,
+    onBackArrowClicked: () -> Unit = {}
 ) {
     CenterAlignedTopAppBar(title = {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (showProfile) {
                 Image(painter = painterResource(id = R.drawable.healthcare), contentDescription = "App logo", modifier = Modifier.size(40.dp))
             }
+            if (icon != null) {
+                Icon(imageVector = icon, contentDescription ="arrow back", modifier = Modifier.clickable { onBackArrowClicked() })
+            }
+            Spacer(modifier = Modifier.width(40.dp))
             Text(text = title, color = MaterialTheme.colorScheme.secondary)
             Spacer(modifier = Modifier.width(150.dp))
         }
@@ -156,7 +174,9 @@ fun DoctorAppBar(
                 navController.navigate(DoctorScreens.LoginScreen.name)
             }
             }) {
-                Icon(imageVector = Icons.Default.Logout, contentDescription = "Logout", tint = MaterialTheme.colorScheme.secondary)
+                if (showProfile) {
+                    Icon(imageVector = Icons.Default.Logout, contentDescription = "Logout", tint = MaterialTheme.colorScheme.secondary)
+                } else Box {}
             }
 
         },
@@ -175,5 +195,74 @@ fun DoctorAppBar(
 fun FABContent(onTap: () -> Unit) {
     FloatingActionButton(onClick = { onTap() }, shape = RoundedCornerShape(50.dp), containerColor = MaterialTheme.colorScheme.primary) {
         Icon(imageVector = Icons.Default.Add, contentDescription = "Add button", tint = MaterialTheme.colorScheme.onSecondary)
+    }
+}
+
+@Composable
+fun AppointmentCard(appointment: MAppointment = MAppointment("asdf", "2024-05-01T10:00", "Cardiology", "Dre", "Plaza Romania"),
+                    onPressDetails: (String) -> Unit = {} ) {
+    Card(shape = RoundedCornerShape(29.dp),
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary,
+            disabledContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        modifier = Modifier
+            .padding(16.dp)
+            .height(180.dp)
+            .width(330.dp)
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(29.dp)),
+    ) {
+        Column(modifier = Modifier.padding(6.dp),
+            verticalArrangement = Arrangement.Top) {
+            Row (verticalAlignment = Alignment.CenterVertically){
+                Icon(imageVector = Icons.Filled.AccountCircle,
+                    contentDescription ="Profile",
+                    modifier = Modifier
+                        .size(65.dp),
+                    tint = MaterialTheme.colorScheme.secondary)
+
+
+                Spacer(modifier = Modifier.width(15.dp))
+                Column() {
+                    Text(text = "Dr. ${appointment.doctor}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold)
+                    Text(text = "${appointment.catergory}",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Normal)
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Column {
+                    Text(text="Date",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Normal)
+                    Text(text = "${appointment.date?.split("T")?.get(0)}",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+                Column (modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Text(text="Location",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Normal)
+                    Text(text = appointment.location.toString(),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Button(onClick = {onPressDetails(appointment.id.toString()) },
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(horizontal = 15.dp)) {
+            Text(text = "Details")
+        }
     }
 }
