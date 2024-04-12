@@ -136,7 +136,7 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
 
                 Spacer(modifier = Modifier.height(13.dp))
 
-                DoctorList( navController,viewModel );
+                DoctorList( navController );
 
 
 
@@ -216,11 +216,12 @@ fun DoctorRow(doctor: MDoctor, navController: NavController) {
 }
 
 @Composable
-fun DoctorList(navController: NavController, viewModel: DoctorSearchViewModel ) {
+fun DoctorList(navController: NavController, viewModel: DoctorSearchViewModel = hiltViewModel() ) {
+    val listOfDoctors = viewModel.listOfDoctors
     LazyColumn (modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(items = viewModel.listOfDoctors.value.data!!) { doctor ->
+        items(items = listOfDoctors) { doctor ->
             DoctorRow(doctor = doctor, navController)
         }
     }
