@@ -20,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DoctorSearchViewModel @Inject constructor (private val repository: DoctorRepository): ViewModel() {
     var listOfDoctors: List<MDoctor> by mutableStateOf(listOf())
+    var availableTimes: List<String> by mutableStateOf(listOf())
     var isLoading: Boolean by mutableStateOf(true)
 
         init {
@@ -27,7 +28,7 @@ class DoctorSearchViewModel @Inject constructor (private val repository: DoctorR
         }
 
         fun searchDoctors(specialty: String, location: String) {
-            viewModelScope.launch(Dispatchers.Main) {
+            viewModelScope.launch() {
                 if (specialty.isEmpty() || location.isEmpty()) {
                     return@launch
                 }
@@ -36,7 +37,7 @@ class DoctorSearchViewModel @Inject constructor (private val repository: DoctorR
                         is Resource.Success -> {
                             listOfDoctors= response.data!!
                             if (listOfDoctors.isNotEmpty()) isLoading = false;
-                            isLoading = false
+//                            isLoading = false
                         }
                         is Resource.Error -> {
                             isLoading = false
@@ -50,6 +51,26 @@ class DoctorSearchViewModel @Inject constructor (private val repository: DoctorR
                     Log.d("Network", exception.message.toString())
 
               }
+            }
+        }
+
+        fun getAvailableTimes(doctorId: String, date: String)  {
+            viewModelScope.launch() {
+                try {
+                    when (val response = repository.getAvailableTimes(doctorId, date)) {
+                        is Resource.Success -> {
+                            availableTimes = response.data!!
+                            if (availableTimes.isNotEmpty()) isLoading = false;
+                            Log.d("Network", "getAvailableTimes: ${response.data}")
+                        }
+                        is Resource.Error -> {
+                            Log.e("Network", "getAvailableTimes: Failed getting available times", )
+                        }
+                        else -> {isLoading = false}
+                    }
+                } catch (exception: Exception) {
+                    Log.d("Network", exception.message.toString())
+                }
             }
         }
 

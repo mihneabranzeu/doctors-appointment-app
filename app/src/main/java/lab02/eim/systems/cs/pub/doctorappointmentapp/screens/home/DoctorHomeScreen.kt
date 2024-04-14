@@ -94,7 +94,7 @@ fun HomeContent(navController: NavController) {
             Text(text = currentUserNamae!!,
                     modifier = Modifier.padding(2.dp),
                     color = Color.Red,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Clip)
@@ -110,21 +110,16 @@ fun HomeContent(navController: NavController) {
 
 @Composable
 fun UpcomingAppointmentsArea(appointments: List<MAppointment>, navController: NavController) {
-   HorizontalScrollableComponent(appointments) {
-       // TODO on card clicked
-   }
+   HorizontalScrollableComponent(appointments, navController)
 }
 
 @Composable
 fun CompletedAppointmentsArea(appointments: List<MAppointment>, navController: NavController) {
-    HorizontalScrollableComponent(appointments) {
-        // TODO on card clicked
-    }
+    HorizontalScrollableComponent(appointments, navController)
 }
 
 @Composable
-fun HorizontalScrollableComponent(appointments: List<MAppointment>,
-                                  onCardPressed: (String) -> Unit) {
+fun HorizontalScrollableComponent(appointments: List<MAppointment>, navController: NavController) {
     val scrollState = rememberScrollState()
 
     Row(modifier = Modifier
@@ -133,7 +128,7 @@ fun HorizontalScrollableComponent(appointments: List<MAppointment>,
         .horizontalScroll(scrollState)) {
         for (appointment in appointments) {
            AppointmentCard(appointment) {
-               onCardPressed(it)
+               navController.navigate(DoctorScreens.AppointmentDetailsScreen.name + "/${appointment.id}")
            }
         }
     }

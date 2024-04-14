@@ -2,14 +2,16 @@ package lab02.eim.systems.cs.pub.doctorappointmentapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import dagger.hilt.android.lifecycle.HiltViewModel
+import androidx.navigation.navArgument
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.DoctorSplashScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.appointments.AppointmentsScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book.BookAppointmentScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book.DoctorSearchViewModel
+import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.details.AppointmentDetailsScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.home.Home
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.login.Login
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.profile.ProfileScreen
@@ -41,6 +43,15 @@ fun DoctorNavigation() {
 
       composable(DoctorScreens.ProfileScreen.name) {
          ProfileScreen(navController = navController)
+      }
+
+      val detailsName = DoctorScreens.AppointmentDetailsScreen.name
+      composable("$detailsName/{appointmentId}", arguments = listOf(navArgument("appointmentId"){
+         type = NavType.StringType
+      })) { BackStackEntry ->
+         BackStackEntry.arguments?.getString("appointmentId").let {
+            AppointmentDetailsScreen(navController = navController, appointmentId = it.toString())
+         }
       }
    }
 }

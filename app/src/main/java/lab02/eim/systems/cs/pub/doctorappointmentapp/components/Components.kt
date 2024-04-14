@@ -230,7 +230,7 @@ fun AppointmentCard(appointment: MAppointment = MAppointment("asdf", "2024-05-01
                     Text(text = "Dr. ${appointment.doctor}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold)
-                    Text(text = "${appointment.catergory}",
+                    Text(text = "${appointment.category}",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Normal)
                 }

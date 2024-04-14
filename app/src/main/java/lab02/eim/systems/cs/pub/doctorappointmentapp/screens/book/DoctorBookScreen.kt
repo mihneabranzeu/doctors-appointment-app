@@ -1,5 +1,6 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -9,24 +10,26 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
@@ -34,14 +37,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import dagger.hilt.android.lifecycle.HiltViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.components.DoctorAppBar
 import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MDoctor
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
@@ -73,9 +77,11 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
         Surface (modifier = Modifier
             .padding(it)
             .fillMaxWidth()) {
-            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier
+                .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally) {
 
-                var date by remember {
+                val date = remember {
                     mutableStateOf("Choose a date")
                 }
 
@@ -84,6 +90,14 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
                 }
 
                 val location = remember {
+                    mutableStateOf("")
+                }
+
+                var time = remember {
+                    mutableStateOf("")
+                }
+
+                var doctorId = remember {
                     mutableStateOf("")
                 }
                 var specialties = listOf(
@@ -102,26 +116,49 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
                     "Constanta"
                 )
 
+                val valid = remember(date, location, specialty) {
+                    derivedStateOf {
+                        date.value.trim() != "Choose a date" && location.value.trim().isNotEmpty() && specialty.value.trim().isNotEmpty()
+                    }
+                }
+
                 var showDatePicker by remember {
+                    mutableStateOf(false)
+                }
+
+                var displayDoctors by remember {
+                    mutableStateOf(false)
+                }
+
+                var showTimePicker by remember {
                     mutableStateOf(false)
                 }
 
                 Box(contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(8.dp)
                         .fillMaxWidth()) {
                     Button(onClick = { showDatePicker = true },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(60.dp)) {
-                        Text(text = date, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(text = date.value, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
                 if (showDatePicker) {
                     MyDatePickerDialog(
-                        onDateSelected = { date = it },
+                        onDateSelected = { date.value = it },
                         onDismiss = { showDatePicker = false }
+                    )
+                }
+
+                if (showTimePicker) {
+                    MyTimePickerDialog(
+                        doctorId = doctorId.value,
+                        date = date.value,
+                        onTimeSelected = {time.value = it},
+                        onDismiss = {showTimePicker = false}
                     )
                 }
 
@@ -130,20 +167,66 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
 
                 Button(onClick = {
                              viewModel.searchDoctors(specialty.value, location.value)
-                }, ) {
+                    displayDoctors = true
+                },  enabled = valid.value) {
                     Text(text = "Search")
                 }
 
                 Spacer(modifier = Modifier.height(13.dp))
 
-                DoctorList( navController );
-
-
-
+                if (displayDoctors) {
+                    DoctorList( navController ) { id ->
+                        viewModel.getAvailableTimes(id, date.value)
+                        doctorId.value = id
+                        showTimePicker = true
+                    }
+                    Button(onClick = {
+                        Log.d("Buc", "date: ${date.value}, time: ${time.value}, specialty: ${specialty.value}, location: ${location.value} ,doctorId: ${doctorId.value}")
+                    }, enabled = valid.value && time.value.trim().isNotEmpty()) {
+                        Text(text = "Book")
+                    }
+                }
             }
         }
 
     }
+
+}
+
+@Composable
+fun MyTimePickerDialog(doctorId: String, date: String, viewModel: DoctorSearchViewModel = hiltViewModel(), onTimeSelected: (String) -> Unit, onDismiss: () -> Unit) {
+    val availableTimes = viewModel.availableTimes
+
+    LaunchedEffect(doctorId) {
+        viewModel.getAvailableTimes(doctorId, date)
+    }
+
+
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Select a time") },
+        text = {
+            if (availableTimes.isEmpty()) {
+                Text("No available times")
+            } else {
+                LazyRow {
+                    items(availableTimes) { time ->
+                        Button(onClick = { onTimeSelected(time) },
+                            modifier = Modifier.padding(4.dp)) {
+                            Text(time.split(" ")[1])
+                        }
+                    }
+                }
+            }
+
+        },
+        confirmButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("Close")
+            }
+        }
+    )
+
 
 }
 
@@ -190,22 +273,24 @@ fun MyDatePickerDialog(
 }
 
 @Composable
-fun DoctorRow(doctor: MDoctor, navController: NavController) {
+fun DoctorRow(doctor: MDoctor, navController: NavController, onDoctorSelected: (String) -> Unit) {
     Card(modifier = Modifier
-        .clickable { }
+        .clickable { onDoctorSelected(doctor.id.toString()) }
         .fillMaxWidth()
         .height(100.dp)
         .padding(3.dp),
-        shape = RectangleShape,
+        shape = RoundedCornerShape(20.dp),
     ) {
-        Row(Modifier.padding(5.dp), verticalAlignment = Alignment.Top) {
+        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.Top) {
             val imageUrl = "https://t3.ftcdn.net/jpg/02/60/04/08/360_F_260040863_fYxB1SnrzgJ9AOkcT0hoe7IEFtsPiHAD.jpg"
             Image(painter = rememberImagePainter(data = imageUrl), contentDescription = "Doctor",
                 modifier = Modifier
                     .width(120.dp)
                     .fillMaxHeight()
-                    .padding(end = 4.dp))
-            Column(modifier = Modifier.padding(8.dp)) {
+                    .padding(end = 4.dp)
+                    .clip(RoundedCornerShape(10.dp)),
+                )
+            Column(modifier = Modifier.padding(4.dp)) {
                 Text(text = doctor.firstName + " " + doctor.lastName, fontWeight = FontWeight.Bold)
                 Text(text = doctor.speciality.toString())
                 Text(text = doctor.location.toString())
@@ -216,13 +301,19 @@ fun DoctorRow(doctor: MDoctor, navController: NavController) {
 }
 
 @Composable
-fun DoctorList(navController: NavController, viewModel: DoctorSearchViewModel = hiltViewModel() ) {
+fun DoctorList(navController: NavController, viewModel: DoctorSearchViewModel = hiltViewModel(), onDoctorSelected: (String) -> Unit ) {
     val listOfDoctors = viewModel.listOfDoctors
-    LazyColumn (modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        items(items = listOfDoctors) { doctor ->
-            DoctorRow(doctor = doctor, navController)
+    if (viewModel.isLoading) {
+        LinearProgressIndicator()
+    } else {
+        LazyColumn (modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp),
+            contentPadding = PaddingValues(16.dp)
+        ) {
+            items(items = listOfDoctors) { doctor ->
+                DoctorRow(doctor = doctor, navController, onDoctorSelected)
+            }
         }
     }
 }
@@ -236,7 +327,7 @@ fun DropdownMenuBox(options: List<String>, selected: MutableState<String>) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -278,6 +369,6 @@ fun DropdownMenuBox(options: List<String>, selected: MutableState<String>) {
 
 fun convertMillisToDate(it: Long): String {
     val date = Date(it)
-    val format = SimpleDateFormat("dd.MM.YYYY", Locale.getDefault())
+    val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     return format.format(date)
 }

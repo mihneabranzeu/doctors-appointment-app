@@ -1,6 +1,5 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.navigation
 
-import androidx.compose.foundation.layout.Spacer
 import java.lang.IllegalArgumentException
 
 enum class DoctorScreens {
@@ -10,8 +9,8 @@ enum class DoctorScreens {
     BookAppointmentScreen,
     AppointmentsScreen,
     ProfileScreen,
-    DoctorHomeScreen;
-
+    DoctorHomeScreen,
+    AppointmentDetailsScreen;
     companion object {
         fun fromRoute(route: String?): DoctorScreens
             = when(route?.substringBefore("/")) {
@@ -22,6 +21,7 @@ enum class DoctorScreens {
                 AppointmentsScreen.name -> AppointmentsScreen
                 ProfileScreen.name -> ProfileScreen
                 DoctorHomeScreen.name -> DoctorHomeScreen
+                AppointmentDetailsScreen.name -> AppointmentDetailsScreen
                 null -> DoctorHomeScreen
                 else -> throw IllegalArgumentException("Route $route is not recognized!")
             }
