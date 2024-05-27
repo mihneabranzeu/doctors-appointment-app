@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import lab02.eim.systems.cs.pub.doctorappointmentapp.components.DoctorAppBar
+import lab02.eim.systems.cs.pub.doctorappointmentapp.data.DataOrException
 import lab02.eim.systems.cs.pub.doctorappointmentapp.data.Resource
 import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MAppointment
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
@@ -65,7 +66,7 @@ fun AppointmentDetailsScreen(navController: NavController,
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally) {
 
-                val appointmentInfo = produceState<Resource<MAppointment>>(initialValue = Resource.Loading()) {
+                val appointmentInfo = produceState<DataOrException<MAppointment, Boolean, Exception>>(initialValue = DataOrException(MAppointment(), true, Exception(""))) {
                     value = viewModel.getAppointmentInfo(appointmentId)
                 }.value
 
@@ -106,10 +107,10 @@ fun AppointmentDetailsScreen(navController: NavController,
 
                             Spacer(modifier = Modifier.width(15.dp))
                             Column() {
-                                Text(text = "Dr. ${appointmentInfo.data.doctor}",
+                                Text(text = "Dr. ${appointmentInfo.data!!.doctor?.firstName} ${appointmentInfo.data!!.doctor?.lastName}",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold)
-                                Text(text = "${appointmentInfo.data.category}",
+                                Text(text = "${appointmentInfo.data!!.category}",
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Normal)
                             }
@@ -143,7 +144,7 @@ fun AppointmentDetailsScreen(navController: NavController,
                               fontWeight = FontWeight.Normal,
                               fontSize = 15.sp
                           )
-                           Text(text = appointmentInfo.data.date.toString(),
+                           Text(text = "${appointmentInfo.data!!.day}.${appointmentInfo.data!!.month}-${appointmentInfo.data!!.year} ${appointmentInfo.data!!.hour}",
                                fontWeight = FontWeight.Bold,
                                fontSize = 20.sp
                            )
@@ -155,7 +156,7 @@ fun AppointmentDetailsScreen(navController: NavController,
                                fontWeight = FontWeight.Normal,
                                fontSize = 15.sp
                            )
-                           Text(text = appointmentInfo.data.location.toString(),
+                           Text(text = appointmentInfo.data!!.location.toString(),
                                fontWeight = FontWeight.Bold,
                                fontSize = 20.sp
                            )

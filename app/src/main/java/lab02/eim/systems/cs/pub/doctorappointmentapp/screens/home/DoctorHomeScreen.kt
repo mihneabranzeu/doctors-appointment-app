@@ -1,5 +1,6 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import lab02.eim.systems.cs.pub.doctorappointmentapp.components.AppointmentCard
@@ -39,7 +42,11 @@ import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MAppointment
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
 
 @Composable
-fun Home(navController: NavController) {
+fun Home(navController: NavController, viewModel: HomeScreenViewModel = hiltViewModel()) {
+    LaunchedEffect(Unit) {
+        viewModel.getAllAppointmentsFromDatabase()
+    }
+
     Scaffold (
         topBar = { DoctorAppBar(title = "Appointment App", navController = navController)},
         floatingActionButton = {
@@ -53,22 +60,23 @@ fun Home(navController: NavController) {
                 .fillMaxSize()
                 .padding(it)
         ) {
-            HomeContent(navController)
+            HomeContent(navController, viewModel)
         }
     }
 }
 
 @Composable
-fun HomeContent(navController: NavController) {
-    val appointments = listOf(
-        MAppointment("1", "2022-01-01", "cardiology", "Petre Dumitrescu", "Orhideea"),
-        MAppointment("2", "2022-02-01", "orthopedy", "Dre", "Orhideea"),
-        MAppointment("3", "2022-03-01", "massage", "Mihai Popescu", "Orhideea"),
-        MAppointment("4", "2022-04-01", "urology", "Petre Dumitrescu", "Orhideea"),
-        MAppointment("5", "2022-05-01", "general", "Petre Dumitrescu", "Orhideea"),
-        MAppointment("6", "2022-06-01", "pediatry", "Petre Dumitrescu", "Orhideea"),
-        MAppointment("7", "2022-07-01", "cardiology", "Petre Dumitrescu", "Orhideea"),
-    )
+fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
+    var listOfAppointments = emptyList<MAppointment>()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    if (!viewModel.data.value.data.isNullOrEmpty()) {
+        listOfAppointments = viewModel.data.value.data!!.toList().filter { appointment ->
+            appointment.userId == currentUser?.uid.toString()
+        }
+
+        Log.d("Appointments", "HomeContent: ${listOfAppointments.toList()}")
+    }
 
     val email = FirebaseAuth.getInstance().currentUser?.email
     val currentUserNamae = if (!email.isNullOrEmpty())
@@ -101,37 +109,49 @@ fun HomeContent(navController: NavController) {
                 HorizontalDivider()
             }
         }
-        UpcomingAppointmentsArea(appointments = appointments, navController = navController)
+        UpcomingAppointmentsArea(appointments = listOfAppointments, navController = navController)
 //        Spacer(modifier = Modifier.height(10.dp))
         TitleSection(label = "Completed Appointments")
-        CompletedAppointmentsArea(appointments = appointments, navController = navController)
+        CompletedAppointmentsArea(appointments = listOfAppointments, navController = navController)
     }
 }
 
 @Composable
 fun UpcomingAppointmentsArea(appointments: List<MAppointment>, navController: NavController) {
-   HorizontalScrollableComponent(appointments, navController)
+   HorizontalScrollableComponent(appointments.filter { appointment -> appointment.isUpcoming == true }, navController)
 }
 
 @Composable
 fun CompletedAppointmentsArea(appointments: List<MAppointment>, navController: NavController) {
-    HorizontalScrollableComponent(appointments, navController)
+    HorizontalScrollableComponent(appointments.filter { appointment -> appointment.isUpcoming == false }, navController)
 }
 
 @Composable
 fun HorizontalScrollableComponent(appointments: List<MAppointment>, navController: NavController) {
     val scrollState = rememberScrollState()
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .height(240.dp)
-        .horizontalScroll(scrollState)) {
-        for (appointment in appointments) {
-           AppointmentCard(appointment) {
-               navController.navigate(DoctorScreens.AppointmentDetailsScreen.name + "/${appointment.id}")
-           }
+    if (appointments.isEmpty()) {
+        Text(text = "No appointments available",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp)
+                .padding(8.dp),
+            color = Color.Red,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+    } else {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .height(240.dp)
+            .horizontalScroll(scrollState)) {
+            for (appointment in appointments) {
+                AppointmentCard(appointment) {
+                    navController.navigate(DoctorScreens.AppointmentDetailsScreen.name + "/${appointment.id}")
+                }
+            }
         }
     }
+
 }
 
 

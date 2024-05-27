@@ -1,9 +1,27 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.model
 
-data class MAppointment(var id: String? = null,
-                        var date: String? = null,
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.PropertyName
+
+data class MAppointment(
+                        @Exclude var id: String? = null,
+//                        var date: Timestamp? = null,
+                        var year: String? = null,
+                        var month: String? = null,
+                        var day: String? = null,
+                        var hour: String? = null,
                         var category: String? = null,
-                        var doctor: String? = null,
-                        var location: String? = null) {
+                        @get: PropertyName("user_id")
+                        @set: PropertyName("user_id")
+                        var userId: String? = null,
+                        @get: PropertyName("doctor_id")
+                        @set: PropertyName("doctor_id")
+                        var doctorId: String? = null,
+                        @get: Exclude var doctor: MDoctor? = null,
+                        @get: Exclude var isUpcoming: Boolean? = false,
+                        var location: String? = null,
+                        var details: String? = null,
+                        var diagnostic: String? = null) {
 
 }

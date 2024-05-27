@@ -1,11 +1,13 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.di
 
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import lab02.eim.systems.cs.pub.doctorappointmentapp.network.DoctorsApi
 import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.DoctorRepository
+import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.FireRepository
 import lab02.eim.systems.cs.pub.doctorappointmentapp.utils.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -26,4 +28,10 @@ object AppModule {
              .build()
              .create(DoctorsApi::class.java)
      }
+
+    @Singleton
+    @Provides
+    fun provideFireAppointmentRepository() = FireRepository(
+        queryAppointment = FirebaseFirestore.getInstance().collection("appointments"),
+        queryDoctor = FirebaseFirestore.getInstance().collection("doctors"))
 }

@@ -54,7 +54,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import lab02.eim.systems.cs.pub.doctorappointmentapp.components.DoctorAppBar
+import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MAppointment
 import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MDoctor
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
 import java.text.SimpleDateFormat
@@ -157,16 +161,18 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
                     MyTimePickerDialog(
                         doctorId = doctorId.value,
                         date = date.value,
-                        onTimeSelected = {time.value = it},
+                        onTimeSelected = {
+                            time.value = it
+                           showTimePicker = false },
                         onDismiss = {showTimePicker = false}
                     )
                 }
 
-                DropdownMenuBox(specialties, specialty)
-                DropdownMenuBox(locations, location)
+                DropdownMenuBox(specialties, specialty, "Category")
+                DropdownMenuBox(locations, location, "Location")
 
                 Button(onClick = {
-                             viewModel.searchDoctors(specialty.value, location.value)
+                    viewModel.searchDoctors(specialty.value, location.value)
                     displayDoctors = true
                 },  enabled = valid.value) {
                     Text(text = "Search")
@@ -174,14 +180,37 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
 
                 Spacer(modifier = Modifier.height(13.dp))
 
+
+
                 if (displayDoctors) {
+                    Log.d("BookAppointmentScreen", "time: ${time.value.toString()}")
+
+                    val firstPart = date.value.split(" ")[0]
+                    val dayMonthYear = firstPart.split(".")
+                    val day = Integer.parseInt(dayMonthYear[0])
+                    val month = Integer.parseInt(dayMonthYear[1])
+                    val year = Integer.parseInt(dayMonthYear[2])
+
                     DoctorList( navController ) { id ->
-                        viewModel.getAvailableTimes(id, date.value)
+                        viewModel.getAvailableTimes(id, year.toString(), month.toString(), day.toString())
                         doctorId.value = id
                         showTimePicker = true
                     }
                     Button(onClick = {
                         Log.d("Buc", "date: ${date.value}, time: ${time.value}, specialty: ${specialty.value}, location: ${location.value} ,doctorId: ${doctorId.value}")
+                        val appointment = MAppointment(
+                            year = year.toString(),
+                            month = month.toString(),
+                            day = day.toString(),
+                            hour = time.value,
+                            category = specialty.value,
+                            doctorId = doctorId.value,
+                            location = location.value,
+                            details = "Details",
+                            diagnostic = "Diagnostic",
+                            userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+                        )
+                        saveToFirebase(appointment, navController)
                     }, enabled = valid.value && time.value.trim().isNotEmpty()) {
                         Text(text = "Book")
                     }
@@ -192,13 +221,41 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
     }
 
 }
+fun saveToFirebase(appointment: MAppointment, navController: NavController) {
+    val db = FirebaseFirestore.getInstance()
+    val dbCollection = db.collection("appointments")
+
+    if (appointment.toString().isNotEmpty()) {
+        dbCollection.add(appointment)
+            .addOnSuccessListener {documentRef ->
+                val docId = documentRef.id
+                dbCollection.document(docId).update(hashMapOf("id" to docId) as Map<String, Any>)
+                    .addOnCompleteListener {task ->
+                        if (task.isSuccessful) {
+                            navController.popBackStack()
+                        }
+                    }.addOnFailureListener {
+                        Log.w("Error", "Error adding document", it)
+                    }
+            }
+    } else {
+
+    }
+
+}
 
 @Composable
 fun MyTimePickerDialog(doctorId: String, date: String, viewModel: DoctorSearchViewModel = hiltViewModel(), onTimeSelected: (String) -> Unit, onDismiss: () -> Unit) {
     val availableTimes = viewModel.availableTimes
 
     LaunchedEffect(doctorId) {
-        viewModel.getAvailableTimes(doctorId, date)
+        // Extract year, month, day from date
+        val dayMonthYear = date.split(".")
+        val day = Integer.parseInt(dayMonthYear[0])
+        val month = Integer.parseInt(dayMonthYear[1])
+        val year = Integer.parseInt(dayMonthYear[2])
+
+        viewModel.getAvailableTimes(doctorId, year.toString(), month.toString(), day.toString())
     }
 
 
@@ -213,7 +270,7 @@ fun MyTimePickerDialog(doctorId: String, date: String, viewModel: DoctorSearchVi
                     items(availableTimes) { time ->
                         Button(onClick = { onTimeSelected(time) },
                             modifier = Modifier.padding(4.dp)) {
-                            Text(time.split(" ")[1])
+                            Text("$time:00")
                         }
                     }
                 }
@@ -302,8 +359,8 @@ fun DoctorRow(doctor: MDoctor, navController: NavController, onDoctorSelected: (
 
 @Composable
 fun DoctorList(navController: NavController, viewModel: DoctorSearchViewModel = hiltViewModel(), onDoctorSelected: (String) -> Unit ) {
-    val listOfDoctors = viewModel.listOfDoctors
-    if (viewModel.isLoading) {
+    val listOfDoctors = viewModel.listOfDoctors.value.data!!
+    if (viewModel.listOfDoctors.value.loading == true) {
         LinearProgressIndicator()
     } else {
         LazyColumn (modifier = Modifier
@@ -320,7 +377,7 @@ fun DoctorList(navController: NavController, viewModel: DoctorSearchViewModel = 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMenuBox(options: List<String>, selected: MutableState<String>) {
+fun DropdownMenuBox(options: List<String>, selected: MutableState<String>, placeholder: String = "Select") {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
@@ -340,6 +397,7 @@ fun DropdownMenuBox(options: List<String>, selected: MutableState<String>) {
                 value = selected.value,
                 onValueChange = {},
                 readOnly = true,
+                placeholder = { Text("$placeholder") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
                     .menuAnchor()

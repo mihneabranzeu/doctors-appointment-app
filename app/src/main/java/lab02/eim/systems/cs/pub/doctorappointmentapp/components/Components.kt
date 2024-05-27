@@ -199,7 +199,7 @@ fun FABContent(onTap: () -> Unit) {
 }
 
 @Composable
-fun AppointmentCard(appointment: MAppointment = MAppointment("asdf", "2024-05-01T10:00", "Cardiology", "Dre", "Plaza Romania"),
+fun AppointmentCard(appointment: MAppointment,
                     onPressDetails: (String) -> Unit = {} ) {
     Card(shape = RoundedCornerShape(29.dp),
         colors = CardColors(
@@ -227,7 +227,7 @@ fun AppointmentCard(appointment: MAppointment = MAppointment("asdf", "2024-05-01
 
                 Spacer(modifier = Modifier.width(15.dp))
                 Column() {
-                    Text(text = "Dr. ${appointment.doctor}",
+                    Text(text = "Dr. ${appointment.doctor?.firstName} ${appointment.doctor?.lastName}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold)
                     Text(text = "${appointment.category}",
@@ -244,7 +244,7 @@ fun AppointmentCard(appointment: MAppointment = MAppointment("asdf", "2024-05-01
                     Text(text="Date",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Normal)
-                    Text(text = "${appointment.date?.split("T")?.get(0)}",
+                    Text(text = "${appointment.day}.${appointment.month}.${appointment.year} ${appointment.hour}:00",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold)
                 }

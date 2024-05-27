@@ -32,13 +32,14 @@ class DoctorRepository @Inject constructor(private val api: DoctorsApi) {
           Resource.Loading(true)
 //          api.getDoctorInfo()
           val appointments = listOf(
-              MAppointment("1", "2022-01-01", "cardiology", "Petre Dumitrescu", "Orhideea"),
-              MAppointment("2", "2022-02-01", "orthopedy", "Dre", "Orhideea"),
-              MAppointment("3", "2022-03-01", "massage", "Mihai Popescu", "Orhideea"),
-              MAppointment("4", "2022-04-01", "urology", "Petre Dumitrescu", "Orhideea"),
-              MAppointment("5", "2022-05-01", "general", "Petre Dumitrescu", "Orhideea"),
-              MAppointment("6", "2022-06-01", "pediatry", "Petre Dumitrescu", "Orhideea"),
-              MAppointment("7", "2022-07-01", "cardiology", "Petre Dumitrescu", "Orhideea"),
+//              MAppointment("1", "2022-01-01", "cardiology", "Petre Dumitrescu", "Orhideea"),
+//              MAppointment("2", "2022-02-01", "orthopedy", "Dre", "Orhideea"),
+//              MAppointment("3", "2022-03-01", "massage", "Mihai Popescu", "Orhideea"),
+//              MAppointment("4", "2022-04-01", "urology", "Petre Dumitrescu", "Orhideea"),
+//              MAppointment("5", "2022-05-01", "general", "Petre Dumitrescu", "Orhideea"),
+//              MAppointment("6", "2022-06-01", "pediatry", "Petre Dumitrescu", "Orhideea"),
+//              MAppointment("7", "2022-07-01", "cardiology", "Petre Dumitrescu", "Orhideea"),
+              MAppointment()
           )
           appointments.find { appointment ->  appointment.id == appointmentId}
       } catch (exception: Exception) {
@@ -61,6 +62,7 @@ class DoctorRepository @Inject constructor(private val api: DoctorsApi) {
                 "16.04.2024 15:00",
                 "16.04.2024 16:00",
                 "16.04.2024 17:00",
+                "26.05.2024 10:00",
            )
             Log.d("AvailableTimes" ,"doctorId: $doctorId, date: $date")
             availableTimes.filter { time -> time.contains(date) }
