@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" >
+<wpt lat="44.42464" lon="26.10322">
+        <name>Bucuresti</name>
+</wpt>
+<wpt lat="45.74882" lon="21.24650">
+        <name>Timisoara</name>
+</wpt>
+<wpt lat="46.76746" lon="23.58181">
+        <name>Cluj-Napoca</name>
+</wpt>
+<wpt lat="44.18023" lon="28.64960">
+        <name>Constanta</name>
+</wpt>
+<wpt lat="47.16011" lon="27.61159">
+        <name>Iasi</name>
+</wpt>
+</gpx>

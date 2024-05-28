@@ -38,7 +38,7 @@ fun DoctorSplashScreen(navController: NavController) {
         if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
             navController.navigate(DoctorScreens.LoginScreen.name)
         } else {
-            navController.navigate(DoctorScreens.DoctorHomeScreen.name)
+            navController.navigate(DoctorScreens.AppointmentsScreen.name)
         }
     }
    Column(verticalArrangement = Arrangement.Center,

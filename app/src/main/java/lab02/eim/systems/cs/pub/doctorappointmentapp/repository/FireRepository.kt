@@ -9,6 +9,7 @@ import lab02.eim.systems.cs.pub.doctorappointmentapp.data.DataOrException
 import lab02.eim.systems.cs.pub.doctorappointmentapp.data.Resource
 import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MAppointment
 import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MDoctor
+import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MLocation
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -72,6 +73,21 @@ class FireRepository @Inject constructor(
         return dataOrException
     }
 
+    suspend fun getDoctorsForLocation(location: MLocation): List<MDoctor> {
+        val dataOrException = DataOrException<List<MDoctor>, Boolean, Exception>()
+
+        try {
+            dataOrException.loading = true
+            dataOrException.data = queryDoctor.get().await().documents.map { documentSnapshot ->
+                documentSnapshot.toObject(MDoctor::class.java)!!
+            }.filter { doctor -> doctor.location == location.name }
+            if (dataOrException.data != null) dataOrException.loading = false
+        } catch (exception: FirebaseFirestoreException) {
+            dataOrException.e = exception
+        }
+        return dataOrException.data!!
+    }
+
     suspend fun getAllDoctorsFromDatabase(): DataOrException<List<MDoctor>, Boolean, Exception> {
         val dataOrException = DataOrException<List<MDoctor>, Boolean, Exception>()
 
@@ -115,7 +131,6 @@ class FireRepository @Inject constructor(
         return availableTimes
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getAppointmentInfo(appointmentId: String): DataOrException<MAppointment, Boolean, Exception> {
         val dataOrException = DataOrException<MAppointment, Boolean, Exception>()
 
@@ -133,6 +148,5 @@ class FireRepository @Inject constructor(
             dataOrException.e = exception
         }
         return dataOrException
-
     }
 }

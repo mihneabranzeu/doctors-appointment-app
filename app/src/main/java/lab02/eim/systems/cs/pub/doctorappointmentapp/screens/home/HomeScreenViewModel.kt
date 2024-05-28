@@ -25,7 +25,6 @@ class HomeScreenViewModel @Inject constructor(
            getAllAppointmentsFromDatabase()
        }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getAllAppointmentsFromDatabase() {
        viewModelScope.launch {
            data.value.loading = true

@@ -7,6 +7,7 @@ plugins {
     // Hilt
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -157,8 +158,23 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.3")
+
+    // Google Maps Compose library
+    val mapsComposeVersion = "4.4.1"
+    implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
+    // Google Maps Compose utility library
+    implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")
+    // Google Maps Compose widgets library
+    implementation("com.google.maps.android:maps-compose-widgets:$mapsComposeVersion")
 }
 // Allow references to generated code
 kapt {
     correctErrorTypes = true
+}
+
+secrets {
+    // Optionally specify a different file name containing your secrets.
+    // The plugin defaults to "local.properties"
+    propertiesFileName = "secrets.properties"
+
 }

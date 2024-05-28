@@ -10,6 +10,7 @@ enum class DoctorScreens {
     AppointmentsScreen,
     ProfileScreen,
     DoctorHomeScreen,
+    DoctorMapScreen,
     AppointmentDetailsScreen;
     companion object {
         fun fromRoute(route: String?): DoctorScreens
@@ -22,6 +23,7 @@ enum class DoctorScreens {
                 ProfileScreen.name -> ProfileScreen
                 DoctorHomeScreen.name -> DoctorHomeScreen
                 AppointmentDetailsScreen.name -> AppointmentDetailsScreen
+                DoctorMapScreen.name -> DoctorMapScreen
                 null -> DoctorHomeScreen
                 else -> throw IllegalArgumentException("Route $route is not recognized!")
             }
