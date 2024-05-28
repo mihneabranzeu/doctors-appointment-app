@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,6 +42,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import lab02.eim.systems.cs.pub.doctorappointmentapp.R
 import lab02.eim.systems.cs.pub.doctorappointmentapp.components.DoctorAppBar
+import lab02.eim.systems.cs.pub.doctorappointmentapp.components.FABContent
 import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MLocation
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.appointments.NavigationOption
@@ -64,7 +67,9 @@ fun DoctorMapScreen(navController: NavController, viewModel: MapScreenViewModel 
     }
 
     Scaffold (
-        topBar = { DoctorAppBar(title = "Appointment App", navController = navController) }
+        topBar = { DoctorAppBar(title = "Appointment App", navController = navController, icon = Icons.AutoMirrored.Filled.ArrowBack ) {
+            navController.navigate(DoctorScreens.AppointmentsScreen.name)
+        } },
     ) {
         Surface(
             modifier = Modifier

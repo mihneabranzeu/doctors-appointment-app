@@ -12,6 +12,8 @@ import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.appointments.Appoin
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book.BookAppointmentScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book.DoctorSearchViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.details.AppointmentDetailsScreen
+import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.documents.DoctorDocumentsScreen
+import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.documents.DocumentsViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.home.Home
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.home.HomeScreenViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.login.Login
@@ -42,9 +44,13 @@ fun DoctorNavigation() {
       }
 
       composable(DoctorScreens.DoctorMapScreen.name) {
-         // DoctorMapScreen(navController = navController)
          val mapViewModel = hiltViewModel<MapScreenViewModel>()
          DoctorMapScreen(navController = navController, viewModel = mapViewModel)
+      }
+
+      composable(DoctorScreens.DoctorDocumentsScreen.name) {
+         val documentsVewModel = hiltViewModel<DocumentsViewModel>()
+         DoctorDocumentsScreen(navController = navController, viewModel = documentsVewModel)
       }
 
       composable(DoctorScreens.LoginScreen.name) {

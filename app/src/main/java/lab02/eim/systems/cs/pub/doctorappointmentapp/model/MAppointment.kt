@@ -1,12 +1,10 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.model
 
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.PropertyName
 
 data class MAppointment(
                         @Exclude var id: String? = null,
-//                        var date: Timestamp? = null,
                         var year: String? = null,
                         var month: String? = null,
                         var day: String? = null,

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -48,7 +49,9 @@ fun Home(navController: NavController, viewModel: HomeScreenViewModel = hiltView
     }
 
     Scaffold (
-        topBar = { DoctorAppBar(title = "Appointment App", navController = navController)},
+        topBar = { DoctorAppBar(title = "Appointment App", navController = navController, icon = Icons.AutoMirrored.Filled.ArrowBack) {
+            navController.navigate(DoctorScreens.AppointmentsScreen.name)
+        } },
         floatingActionButton = {
             FABContent {
                 navController.navigate(DoctorScreens.BookAppointmentScreen.name)

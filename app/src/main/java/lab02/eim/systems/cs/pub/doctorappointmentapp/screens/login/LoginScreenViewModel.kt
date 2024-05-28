@@ -14,7 +14,6 @@ import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MUser
 
 
 class LoginScreenViewModel: ViewModel() {
-//    val loadingState = MutableStateFlow(LoadingState.IDLE)
     private val auth: FirebaseAuth = Firebase.auth
 
     private val _loading = MutableLiveData(false)
