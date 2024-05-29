@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "DoctorAppointmentApp"
 include(":app")
+include(":fl_tensorflow")

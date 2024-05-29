@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,13 +22,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import lab02.eim.systems.cs.pub.doctorappointmentapp.R
 import lab02.eim.systems.cs.pub.doctorappointmentapp.components.DoctorAppBar
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
 
 @Composable
-fun AppointmentsScreen(navController: NavController) {
+fun AppointmentsScreen(navController: NavController, viewModel: AppointmentsViewModel = hiltViewModel()) {
     Scaffold (
         topBar = { DoctorAppBar(title = "Appointment App", navController = navController)}
     ) {
@@ -54,6 +56,14 @@ fun AppointmentsScreen(navController: NavController) {
                     label = "Documents",
                     onClick = { navController.navigate(DoctorScreens.DoctorDocumentsScreen.name) }
                 )
+                NavigationOption(
+                    iconId = R.drawable.fl,
+                    label = "Federated Learning",
+                    onClick = { navController.navigate(DoctorScreens.DoctorFLScreen.name) }
+                )
+                Button(onClick = { viewModel.startWork() }) {
+                    Text(text = "Start Work")
+                }
 
             }
         }

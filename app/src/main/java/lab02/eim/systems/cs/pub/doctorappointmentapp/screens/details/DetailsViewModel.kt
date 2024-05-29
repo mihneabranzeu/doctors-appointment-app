@@ -13,7 +13,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailsViewModel @Inject constructor(private val repository: FireRepository): ViewModel() {
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getAppointmentInfo(appointmentId: String): DataOrException<MAppointment, Boolean, Exception> {
         return repository.getAppointmentInfo(appointmentId)
     }

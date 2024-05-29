@@ -18,7 +18,6 @@ class FireRepository @Inject constructor(
     private val queryAppointment: Query,
     private val queryDoctor: Query
 ) {
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getAllAppointmentsFromDatabase(): DataOrException<List<MAppointment>, Boolean, Exception> {
         val dataOrException = DataOrException<List<MAppointment>, Boolean, Exception>()
 
@@ -38,7 +37,6 @@ class FireRepository @Inject constructor(
         return dataOrException
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun isAppointmentUpcoming(appointment: MAppointment): Boolean {
         // Format the month and day as two digits
         val formattedMonth = appointment.month?.padStart(2, '0')

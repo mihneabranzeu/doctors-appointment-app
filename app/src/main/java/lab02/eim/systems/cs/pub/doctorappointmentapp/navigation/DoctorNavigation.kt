@@ -9,11 +9,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.DoctorSplashScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.appointments.AppointmentsScreen
+import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.appointments.AppointmentsViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book.BookAppointmentScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.book.DoctorSearchViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.details.AppointmentDetailsScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.documents.DoctorDocumentsScreen
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.documents.DocumentsViewModel
+import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.fl.DoctorFLScreen
+import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.fl.FLViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.home.Home
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.home.HomeScreenViewModel
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.login.Login
@@ -35,7 +38,13 @@ fun DoctorNavigation() {
       }
 
       composable(DoctorScreens.AppointmentsScreen.name) {
-         AppointmentsScreen(navController = navController)
+         val appointmentsViewModel = hiltViewModel<AppointmentsViewModel>()
+         AppointmentsScreen(navController = navController, viewModel = appointmentsViewModel)
+      }
+
+      composable(DoctorScreens.DoctorFLScreen.name) {
+          val flViewModel = hiltViewModel<FLViewModel>()
+         DoctorFLScreen(navController = navController, viewModel = flViewModel)
       }
 
       composable(DoctorScreens.BookAppointmentScreen.name) {

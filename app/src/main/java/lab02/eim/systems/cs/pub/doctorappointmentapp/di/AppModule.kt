@@ -12,8 +12,10 @@ import lab02.eim.systems.cs.pub.doctorappointmentapp.data.XRayDatabase
 import lab02.eim.systems.cs.pub.doctorappointmentapp.data.XRayDatabaseDao
 import lab02.eim.systems.cs.pub.doctorappointmentapp.network.DoctorsApi
 import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.DoctorRepository
+import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.FLRepository
 import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.FireRepository
 import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.LocationRepository
+import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.WorkManagerRepository
 import lab02.eim.systems.cs.pub.doctorappointmentapp.utils.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -57,4 +59,12 @@ object AppModule {
             XRayDatabase::class.java,
             "xray-database"
         ).fallbackToDestructiveMigration().build()
+
+    @Singleton
+    @Provides
+    fun provideWorkManagerRepository(@ApplicationContext context: Context) = WorkManagerRepository(context)
+
+    @Singleton
+    @Provides
+    fun provideFLRepository(@ApplicationContext context: Context) = FLRepository(context)
 }

@@ -14,7 +14,6 @@ import lab02.eim.systems.cs.pub.doctorappointmentapp.model.MAppointment
 import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.FireRepository
 import javax.inject.Inject
 
-@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val repository: FireRepository) : ViewModel() {

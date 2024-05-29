@@ -40,6 +40,7 @@ import lab02.eim.systems.cs.pub.doctorappointmentapp.components.EmailInput
 import lab02.eim.systems.cs.pub.doctorappointmentapp.components.PasswordInput
 import lab02.eim.systems.cs.pub.doctorappointmentapp.navigation.DoctorScreens
 
+val dev = mutableStateOf(false)
 @Composable
 fun Login(navController: NavController,
           viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
