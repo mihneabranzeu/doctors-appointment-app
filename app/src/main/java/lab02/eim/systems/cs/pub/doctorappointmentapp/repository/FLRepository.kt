@@ -11,7 +11,6 @@ import com.federatedlearningplatform.fl_tensorflow.helpers.loadMappedAssetFile
 import com.federatedlearningplatform.fl_tensorflow.helpers.negativeLogLikelihoodLoss
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import lab02.eim.systems.cs.pub.doctorappointmentapp.screens.fl.Float3DArray
@@ -35,7 +34,6 @@ val CLASSES = listOf(
     "automobile"
 )
 class FLRepository(@ApplicationContext private val context: Context) {
-    val scope = MainScope()
     suspend fun loadData(
         flowerClient: FLClient<Float3DArray, FloatArray>,
         device_id: Int
@@ -94,18 +92,7 @@ class FLRepository(@ApplicationContext private val context: Context) {
         return normalizedRgb
     }
 
-    fun createFLClient(): FLClient<Float3DArray, FloatArray> {
-        val buffer = loadMappedAssetFile(context, "model/cifar10.tflite")
-        val layersSizes = intArrayOf(1800, 24, 9600, 64, 768000, 480, 40320, 336, 3360, 40)
-        return FLClient(buffer, layersSizes, SampleSpec(
-            { it.toTypedArray() },
-            { it.toTypedArray() },
-            { Array(it) { FloatArray(CLASSES.size) } },
-            ::negativeLogLikelihoodLoss,
-            ::classifierAccuracy
-        )
-        )
-    }
+
 
     private fun getClass(path: String): String {
         return path.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[2]
@@ -132,4 +119,16 @@ class FLRepository(@ApplicationContext private val context: Context) {
         }.toFloatArray()
     }
 
+    fun createFLClient(): FLClient<Float3DArray, FloatArray> {
+        val buffer = loadMappedAssetFile(context, "model/cifar10.tflite")
+        val layersSizes = intArrayOf(1800, 24, 9600, 64, 768000, 480, 40320, 336, 3360, 40)
+        return FLClient(buffer, layersSizes, SampleSpec(
+            { it.toTypedArray() },
+            { it.toTypedArray() },
+            { Array(it) { FloatArray(CLASSES.size) } },
+            ::negativeLogLikelihoodLoss,
+            ::classifierAccuracy
+        )
+        )
+    }
 }

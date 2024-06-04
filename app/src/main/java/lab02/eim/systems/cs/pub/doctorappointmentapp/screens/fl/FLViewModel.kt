@@ -1,5 +1,6 @@
 package lab02.eim.systems.cs.pub.doctorappointmentapp.screens.fl
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.federatedlearningplatform.fl_tensorflow.FLClient
@@ -12,12 +13,12 @@ import lab02.eim.systems.cs.pub.doctorappointmentapp.repository.FLRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class FLViewModel @Inject constructor(private val flRepository: FLRepository) : ViewModel() {
+class FLViewModel @Inject constructor(private val flRepository: FLRepository, application: Application) : ViewModel() {
     private val _textResult = MutableStateFlow<String>("")
     val textResult: StateFlow<String> = _textResult
 
     private var flClient: FLClient<Float3DArray, FloatArray> = flRepository.createFLClient()
-    private var flService: FLService<Float3DArray, FloatArray> = createFLService(flClient) {
+    private var flService: FLService<Float3DArray, FloatArray> = createFLService(flClient, projectId = "839ffc6f-eadb-490e-aec4-51134b0a03c4_31873db1-7c5b-4422-ba9c-aff3fcfa1") {
         setTextResult(it)
     }
 

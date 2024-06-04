@@ -11,11 +11,11 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 class FLService<X: Any, Y: Any>(
     val flClient: FLClient<X, Y>,
-    val callback: (String) -> Unit
+    val callback: (String) -> Unit,
+    val projectId: String
 ){
     private val scope = MainScope()
 
@@ -29,27 +29,32 @@ class FLService<X: Any, Y: Any>(
 
     fun fit() {
         scope.launch {
-            val downloadLink = getParametersDownloadLink()
-            // Download the parameters
-            val parametersMap = downloadParameters(downloadLink)
-            if (parametersMap != null) {
-                flClient.updateParameters(decodeParameters(parametersMap))
+            try {
+                val downloadLink = getParametersDownloadLink()
+                // Download the parameters
+                val parametersMap = downloadParameters(downloadLink)
+                if (parametersMap != null) {
+                    flClient.updateParameters(decodeParameters(parametersMap))
+                }
+                callback("Parameters updated")
+                Log.d(TAG, "Handling Fit")
+                val epochs = 5
+                callback("Handling Fit")
+                flClient.fit(
+                    epochs,
+                    lossCallback = {callback("Avergae loss: ${it.average()}.")}
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in fit: ${e.message}")
+                callback("Error in fit: ${e.message}")
             }
-            callback("Parameters updated")
-            Log.d(TAG, "Handling Fit")
-            val epochs = 5
-            callback("Handling Fit")
-            flClient.fit(
-                epochs,
-                lossCallback = {callback("Avergae loss: ${it.average()}.")}
-            )
         }
     }
 
     fun sendModelParameters() {
         val parameters = getParameters()
 
-        val url = "$SERVER_URL/mnist/pushModelMitch"
+        val url = "$SERVER_URL/mnist/pushModel/$projectId"
 
         val jsonPayload = encodeParametersToBase64(parameters)
         val requestBody = jsonPayload.toRequestBody("application/json".toMediaTypeOrNull())
@@ -110,7 +115,7 @@ class FLService<X: Any, Y: Any>(
 
 
     private suspend fun getParametersDownloadLink(): String {
-        val url = "$SERVER_URL/mnist/getModelDownloadUrl"
+        val url = "$SERVER_URL/mnist/getModelDownloadUrl/$projectId"
         val request = Request.Builder()
             .url(url)
             .get()
@@ -150,9 +155,10 @@ class FLService<X: Any, Y: Any>(
 
 fun <X:Any, Y: Any> createFLService(
     flClient: FLClient<X, Y>,
+    projectId: String,
     callback: (String) -> Unit
 ): FLService<X, Y> {
-    return FLService(flClient, callback)
+    return FLService(flClient, callback, projectId)
 }
 
 data class ModelParameter(val name: String, val value: String);

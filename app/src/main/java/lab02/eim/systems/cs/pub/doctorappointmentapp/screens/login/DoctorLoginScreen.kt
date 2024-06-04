@@ -60,13 +60,13 @@ fun Login(navController: NavController,
             if (showLoginForm.value) {
                 UserForm(loading = false, isCreateAccount = false) {email: String, password:String ->
                     viewModel.signInWithEmailAndPassword(email, password) {
-                        navController.navigate(DoctorScreens.DoctorHomeScreen.name)
+                        navController.navigate(DoctorScreens.AppointmentsScreen.name)
                     }
                 }
             } else {
                 UserForm(loading = false, isCreateAccount = true) {email, password ->
                    viewModel.createUserWithEmailAndPassword(email, password) {
-                       navController.navigate(DoctorScreens.DoctorHomeScreen.name)
+                       navController.navigate(DoctorScreens.AppointmentsScreen.name)
                    }
                 }
             }

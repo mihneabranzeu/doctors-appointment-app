@@ -74,7 +74,7 @@ fun BookAppointmentScreen(navController: NavController, viewModel: DoctorSearchV
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
                     navController = navController,
                     showProfile = false) {
-            navController.navigate(DoctorScreens.DoctorHomeScreen.name)
+            navController.navigate(DoctorScreens.AppointmentsScreen.name)
         }
                  },
     ) {
@@ -238,10 +238,7 @@ fun saveToFirebase(appointment: MAppointment, navController: NavController) {
                         Log.w("Error", "Error adding document", it)
                     }
             }
-    } else {
-
     }
-
 }
 
 @Composable

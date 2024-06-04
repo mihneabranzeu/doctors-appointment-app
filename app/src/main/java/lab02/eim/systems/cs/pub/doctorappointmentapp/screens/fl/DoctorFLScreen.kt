@@ -49,7 +49,7 @@ fun DoctorFLScreen(navController: NavController, viewModel: FLViewModel = hiltVi
             icon = Icons.AutoMirrored.Filled.ArrowBack,
             navController = navController,
             showProfile = false) {
-            navController.navigate(DoctorScreens.DoctorHomeScreen.name)
+            navController.navigate(DoctorScreens.AppointmentsScreen.name)
         } }
     ) {
         Surface(
